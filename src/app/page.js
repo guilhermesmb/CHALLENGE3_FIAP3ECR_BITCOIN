@@ -5,14 +5,13 @@ import Image from 'next/image';
 import homeimage from './images/hospital.jpg';
 
 export default function Home() {
-  // Defina estados para o peso do paciente, opção de dosagem selecionada e resultado.
+  
   const [peso, setPeso] = useState(70);
-  const [dosagemSelecionada, setDosagemSelecionada] = useState('sim'); // 'sim' ou 'nao'
+  const [dosagemSelecionada, setDosagemSelecionada] = useState('sim');
   const [resultado, setResultado] = useState(null);
 
-  // Função para calcular a dosagem com base nos valores atuais.
   const calcularDosagem = () => {
-    // Faça o cálculo com base no peso e na opção de dosagem selecionada.
+    
     let dosagem = 0;
     if (dosagemSelecionada === 'sim') {
       dosagem = peso * 1.5;
@@ -20,10 +19,8 @@ export default function Home() {
       dosagem = peso * 1;
     }
   
-    // Arredonde para menos usando Math.floor()
     dosagem = Math.floor(dosagem);
   
-    // Atualize o estado do resultado.
     setResultado(dosagem);
   };
 
@@ -73,14 +70,13 @@ export default function Home() {
 
           <button
             className="bg-red-800 p-2 rounded"
-            type="button" // Use type="button" para evitar que o formulário seja enviado
+            type="button"
             onClick={calcularDosagem}
           >
             Calcular Dosagem
           </button>
         </form>
 
-        {/* Exibir o resultado, se estiver disponível */}
         {resultado !== null && (
           <div className="mt-4 flex  flex-col items-center">
             <p className='text-xl'>Resultado da Dosagem:</p>
