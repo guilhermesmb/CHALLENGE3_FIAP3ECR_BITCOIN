@@ -1,10 +1,31 @@
 'use client'
 
-import Image from "next/image";
-import homeimage from "./images/hospital.jpg"
-import { useState } from "react";
+import React, { useState } from 'react';
+import Image from 'next/image';
+import homeimage from './images/hospital.jpg';
 
 export default function Home() {
+  // Defina estados para o peso do paciente, opção de dosagem selecionada e resultado.
+  const [peso, setPeso] = useState(70);
+  const [dosagemSelecionada, setDosagemSelecionada] = useState('sim'); // 'sim' ou 'nao'
+  const [resultado, setResultado] = useState(null);
+
+  // Função para calcular a dosagem com base nos valores atuais.
+  const calcularDosagem = () => {
+    // Faça o cálculo com base no peso e na opção de dosagem selecionada.
+    let dosagem = 0;
+    if (dosagemSelecionada === 'sim') {
+      dosagem = peso * 1.5;
+    } else if (dosagemSelecionada === 'nao') {
+      dosagem = peso * 1;
+    }
+  
+    // Arredonde para menos usando Math.floor()
+    dosagem = Math.floor(dosagem);
+  
+    // Atualize o estado do resultado.
+    setResultado(dosagem);
+  };
 
   return (
     <div className="flex">
@@ -15,37 +36,58 @@ export default function Home() {
         <h2 className="p-10 text-3xl">Dosagem para Tratamento da TEV</h2>
 
         <form className="flex flex-col gap-2">
-
           <label htmlFor="peso">Peso do Paciente (Kg)</label>
-
           <input
-            defaultValue={70}
+            value={peso}
+            onChange={(e) => setPeso(e.target.value)}
             min={41}
             max={99}
             type="number"
             id="peso"
-            className="bg-slate-600 p-1 rounded" />
+            className="bg-slate-600 p-1 rounded"
+          />
 
-          <label className="p-1" htmlFor="layout_sim">1,5 mg / kg - 24h</label>
+          <label className="p-1" htmlFor="layout_sim">
+            1,5 mg / kg - 24h
+          </label>
           <input
             type="radio"
             id="layout_sim"
             name="layout"
-            value="sim" />
-          
+            value="sim"
+            checked={dosagemSelecionada === 'sim'}
+            onChange={() => setDosagemSelecionada('sim')}
+          />
 
-          <label className="p-1" htmlFor="layout_nao">1 mg / kg - 12h</label>
+          <label className="p-1" htmlFor="layout_nao">
+            1 mg / kg - 12h
+          </label>
           <input
             type="radio"
             id="layout_nao"
             name="layout"
-            value="nao" />
+            value="nao"
+            checked={dosagemSelecionada === 'nao'}
+            onChange={() => setDosagemSelecionada('nao')}
+          />
 
-          <button className="bg-red-800 p-2 rounded">Calcular Dosagem</button>
-
+          <button
+            className="bg-red-800 p-2 rounded"
+            type="button" // Use type="button" para evitar que o formulário seja enviado
+            onClick={calcularDosagem}
+          >
+            Calcular Dosagem
+          </button>
         </form>
 
+        {/* Exibir o resultado, se estiver disponível */}
+        {resultado !== null && (
+          <div className="mt-4 flex  flex-col items-center">
+            <p className='text-xl'>Resultado da Dosagem:</p>
+            <p className='text-2xl'> Enoxaparina {resultado.toFixed(0)} mg</p>
+          </div>
+        )}
       </main>
     </div>
-  )
+  );
 }
