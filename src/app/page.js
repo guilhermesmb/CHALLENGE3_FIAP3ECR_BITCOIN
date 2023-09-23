@@ -1,5 +1,6 @@
 'use client'
 
+import jsPDF from 'jspdf';
 import Image from 'next/image';
 import React, { useState, useEffect } from 'react';
 import homeimage from './images/hospital.jpg';
@@ -14,19 +15,6 @@ export default function Home() {
   const [peso, setPeso] = useState(70);
   const [dosagemSelecionada, setDosagemSelecionada] = useState('sim');
   const [resultado, setResultado] = useState(null);
-
-  const calcularDosagem = () => {
-    let dosagem = 0;
-    if (dosagemSelecionada === 'sim') {
-      dosagem = peso * 1.5;
-    } else if (dosagemSelecionada === 'nao') {
-      dosagem = peso * 1;
-    }
-
-    dosagem = Math.floor(dosagem);
-
-    setResultado(dosagem);
-  };
 
   const cadastrarPaciente = () => {
     const paciente = {
@@ -57,6 +45,52 @@ export default function Home() {
       });
   };
 
+  const gerarPdf = () => {
+    // Crie um novo documento PDF
+    const doc = new jsPDF();
+  
+    // Defina o título do PDF
+    doc.text('Relatório de Dosagem', 10, 10);
+  
+    // Obtenha o CPF do paciente do formulário
+    const cpfPaciente = document.getElementById('cpf_paciente').value;
+  
+    // Obtenha os dados do paciente correspondente ao CPF
+    const pacienteSelecionado = require('db.json').pacientes.find((paciente) => paciente.cpf === cpfPaciente);
+  
+    if (pacienteSelecionado) {
+      // Dados do paciente selecionado
+      const { nome, cpf, data_nascimento } = pacienteSelecionado;
+  
+      // Calcula a dosagem com base nos valores atuais de peso e seleção de dosagem
+      let dosagem = 0;
+      if (dosagemSelecionada === 'sim') {
+        dosagem = peso * 1.5;
+      } else if (dosagemSelecionada === 'nao') {
+        dosagem = peso * 1;
+      }
+      dosagem = Math.floor(dosagem);
+  
+      // Crie uma string com os dados do paciente selecionado e a dosagem
+      const dadosPacienteSelecionado = `Nome: ${nome}\n`
+        + `CPF do Paciente: ${cpf}\n`
+        + `Data de Nascimento: ${data_nascimento}\n`
+        + `Peso do Paciente: ${peso} Kg\n`
+        + `Dosagem Necessária: ${dosagem} mg`;
+  
+      // Adicione os dados do paciente selecionado ao PDF
+      doc.text(dadosPacienteSelecionado, 10, 30);
+  
+      // Salve o PDF com um nome específico (por exemplo, paciente.pdf)
+      doc.save('paciente.pdf');
+    } else {
+      // Paciente não encontrado
+      doc.text('Paciente não encontrado.', 10, 30);
+      doc.save('paciente.pdf');
+    }
+  };
+  
+
   useEffect(() => {
     if (cadastroSucesso) {
       setNome('');
@@ -68,7 +102,7 @@ export default function Home() {
   return (
     <div className="flex">
       <aside className="hidden lg:flex h-screen">
-      <Image src={homeimage} className="h-auto w-auto object-cover" alt='foto_medico'/>
+        <Image src={homeimage} className="h-auto w-auto object-cover" alt='foto_medico'/>
       </aside>
       <main className="flex flex-col justify-center items-center p-4 h-screen w-full">
         <h2 className="p-10 text-3xl">Cadastro de Pacientes</h2>
@@ -152,21 +186,16 @@ export default function Home() {
             onChange={() => setDosagemSelecionada('nao')}
           />
 
-          <button
-            className="bg-red-800 p-2 rounded"
-            type="button"
-            onClick={calcularDosagem}
-          >
-            Gerar Dosagem Necessária
-          </button>
+        <button
+          className="bg-red-800 p-2 rounded"
+          type="button"
+          onClick={() => {
+            gerarPdf();
+          }}
+        >
+          Gerar Dosagem Necessária e PDF
+        </button>
         </form>
-
-        {resultado !== null && (
-          <div className="mt-4 flex  flex-col items-center">
-            <p className='text-xl'>Resultado da Dosagem:</p>
-            <p className='text-2xl'>Enoxaparina {resultado.toFixed(0)} mg</p>
-          </div>
-        )}
       </main>
     </div>
   );
