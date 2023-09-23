@@ -41,7 +41,7 @@ export default function Home() {
             name="layout"
             value="nao" />
 
-          <button className="bg-sky-800 p-2 rounded">Calcular Dosagem</button>
+          <button className="bg-red-800 p-2 rounded">Calcular Dosagem</button>
 
         </form>
 
